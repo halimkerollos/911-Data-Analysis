@@ -1,0 +1,45 @@
+"""
+I was curious if any of the townships had particularly more of specific types of calls, such as overdosees or violent crimes such as stabbings.
+The collowing code is a quick comparison of those features to determine if there is such a township and which they are:
+"""
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt, seaborn as sns
+%matplotlib inline
+df = pd.read_csv('911.csv')
+
+#Adding a new column describing the specific reason EMS was called:
+df['specific_EMS'] = df[df['reason']=='EMS']['title'].apply(lambda title:title.split(': ')[1])
+
+#Plotting both the top and tail values for these specific calls
+plt.figure(figsize=(12,8))
+df[df['reason']=='EMS']['specific_EMS'].value_counts()[:25].plot(kind='bar')
+
+plt.figure(figsize=(12,8))
+df[df['reason']=='EMS']['specific_EMS'].value_counts()[-25:].plot(kind='bar')
+
+#Checking overdose cases in townships:
+df[df['specific_EMS']=='OVERDOSE'].groupby('twp')['title'].count().sort_values(ascending=False)
+
+plt.figure(figsize=(12,8))
+df[df['specific_EMS']=='OVERDOSE'].groupby('twp')['title'].count().sort_values(ascending=False)[:25].plot(kind='bar')
+plt.title('Overdoses per township')
+plt.xlabel=('Township')
+plt.ylabel=('Number of Overdoses')
+plt.tight_layout()
+plt.legend(bbox_to_anchor=(1.01, 1),borderaxespad=0)
+plt.xticks(rotation=90)
+
+#Now stabbings:
+plt.figure(figsize=(12,8))
+df[df['specific_EMS']=='STABBING'].groupby('twp')['title'].count().sort_values(ascending=False).plot(kind='bar')
+plt.title('Stabbings per Township')
+plt.xlabel=('Township')
+plt.ylabel=('Number of Stabbings')
+plt.tight_layout()
+plt.xticks(rotation=90)
+
+"""
+Just from the simple queries above I would personally stay away from two townships which have overwhelmingly more overdoses and stabbings than the other
+townships. They are Norristown and Pottstown. More analysis will be added as I continue exploring the dataset on my own!
+"""
